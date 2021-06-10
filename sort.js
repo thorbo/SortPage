@@ -1,30 +1,24 @@
 // GLOBALS
-const TOTAL = 6
-const MIN = 1
-const MAX = 20
-const NUMSTART = [['position', 'value', {role: 'style'}]]
+var TOTAL = 20          // number of elements to sort
+const MIN = 1           // min number value
+const MAX = 20          // max number value
+const NUMSTART = [['position', 'value', {role: 'style'}]]       // header row for data in google charts
 const MAXSPEED = 2000   // slowest speed in ms
 var nums = []           // list of lists of ints [0,5,'green'],[1,17,'green'],[2,18,'green'],[3,12,'green'],[4, 9,'green']
 var SPEED
+var COUNTER = 0
 
 // Load the Visualization API and the corechart package.
 google.charts.load('current', {'packages':['corechart']});
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('number').value = 10
+    TOTAL = document.getElementById('number').value
     randNums();
 
-//    with (document.getElementById('speed')) {
-//        this.max = MAXSPEED
-//        this.value = MAXSPEED * 0.8
-//        SPEED = MAXSPEED - this.value
-//        console.log(this.max)
-//        console.log(this.value)
-//    };
     document.getElementById('speed').max = MAXSPEED;
-    document.getElementById('speed').value = MAXSPEED*0.8;
+    document.getElementById('speed').value = MAXSPEED * 0.8;
     SPEED = MAXSPEED - (MAXSPEED*0.8);
-
-
 
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawChart);
@@ -35,22 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     document.querySelector('#sort').onclick = numSort;
-
     document.querySelector('#selection').onclick = selectionSort;
-
     document.querySelector('#bubble').onclick = bubbleSort;
-
     document.querySelector('#insertion').onclick = insertionSort;
-
     document.querySelector('#random').onclick = randomSort;
+    document.querySelector('#merge').onclick = () => {
+        // Copy nums by value into dup_nums. Perform sort on dup_nums
+        const dup_nums = [...nums]
+        for (i=0; i<dup_nums.length; i++){
+            dup_nums[i] = [...dup_nums[i]]
+        }
+        mergeSort(dup_nums)
+        };
+    document.querySelector('#shell').onclick = shellSort;
+    document.querySelector('#heap').onclick = heapSort;
 
-    document.querySelector('#quick').onclick = () => {
-        quickSort(0, TOTAL - 1)
-    };
+    document.querySelector('#quick').onclick = () => {quickSort(0, TOTAL - 1)};
 
-    document.querySelector('#speed').onchange = function () {
-        SPEED = MAXSPEED - this.value
-    };
+    document.querySelector('#speed').onchange = function () {SPEED = MAXSPEED - this.value};
+
+    document.querySelector('#number').onchange = function () {TOTAL = this.value};
 });
 
 function drawChart() {
@@ -81,10 +79,6 @@ function randInt() {
         return Math.floor(Math.random() * (arguments[1] - arguments[0])) + arguments[0]
     };
 };
-
-//function randInt(min, max) {
-//    return Math.floor(Math.random() * (max - min)) + min
-//};
 
 function randNums() {
     // reset nums with random values
@@ -146,19 +140,18 @@ async function selectionSort() {
 };
 
 async function bubbleSort() {
-    var smallVal
-    var prevIdx
     var tmp
     var swap = true
+    var passes = 1
 
-    // Go through entire list, swapping when val(i) < val(i+1).
+    // Go through entire list, swapping when val(i) > val(i+1).
     // Stop when you go through list with no swaps
     while (swap == true) {
         swap = false
-        for (i=0; i < TOTAL - 1; i++) {
+        for (i=0; i < TOTAL - passes; i++) {
             nums[i][2] = 'red'
             nums[i+1][2] = 'yellow'
-            drawChart();
+            drawChart()
             await sleep(SPEED)
             if (nums[i][1] > nums[i+1][1]) {
                 swap = true
@@ -169,14 +162,15 @@ async function bubbleSort() {
                 nums[i+1][2] = 'purple'
                 drawChart();
                 await sleep(SPEED)
-            };
+            }
             nums[i][2] = '#069420'
-            if (i == TOTAL - 2) {
+//            if (i == TOTAL - 2) {
                 nums[i+1][2] = '#069420'
-            };
-        };
-    };
-};
+//            }
+        }
+        passes++
+    }
+}
 
 async function insertionSort() {
     var tmp
@@ -185,38 +179,35 @@ async function insertionSort() {
         var j = i
         nums[j][2] = 'red'
         nums[j-1][2] = 'yellow'
-        drawChart();
+        drawChart()
         await sleep(SPEED)
         while (j > 0 && nums[j-1][1] > nums[j][1]) {
-
-            nums[j][2] = 'purple'
-            nums[j-1][2] = 'purple'
             tmp = nums[j][1]
             nums[j][1] = nums[j-1][1]
             nums[j-1][1] = tmp
             j--
-            drawChart();
-            await sleep(SPEED)
             nums[j+1][2] = '#069420'
             nums[j][2] = 'red'
             if (j !== 0) {
                 nums[j-1][2] = 'yellow'
-                drawChart();
-                await sleep(SPEED)
-            };
-        };
+            }
+            nums[i][2] = 'purple'
+            drawChart();
+            await sleep(SPEED)
+        }
+        nums[i][2] = '#069420'
         if (j > 0) {
             nums[j-1][2] = '#069420'
-        };
+        }
         nums[j][2] = '#069420'
-    };
-};
+    }
+}
 
 async function quickSort(left, right) {
     var l = left;
     var r = right;
     var tmp;
-    var color = '#'+ Math.floor(Math.random()*16777215).toString(16)
+    var color = '#'+ Math.floor(Math.random()*16777215).toString(16)    // random hex value
     // Set pivot index as middle of array (arbitrary)
     // Store pivot value
     var pivot = Math.floor((l + r) / 2);
@@ -248,13 +239,13 @@ async function quickSort(left, right) {
         // Perform swap, checking if pointers are still valid
         if (l <= r) {
 
-            if (l == pivot) {
+            if (l > pivot) {
                 nums[pivot][2] = color
-                pivot = r;
+                pivot = l;
                 nums[pivot][2] = 'red'
-            } else if (r == pivot) {
+            } else if (r < pivot) {
                 nums[pivot][2] = color
-                pivot = l
+                pivot = r
                 nums[pivot][2] = 'red'
             };
 
@@ -268,7 +259,6 @@ async function quickSort(left, right) {
         };
     };
     nums[pivot][2] = color
-    nums[l][2] = 'red'
     quickSort(left, l-1);
     quickSort(l, right);
 };
@@ -311,6 +301,120 @@ async function randomSort() {
     };
 };
 
+function mergeSort(arr0) {
+
+    const middle = Math.floor((arr0.length)/2)
+
+    if (arr0.length == 1){
+        return arr0
+    }
+
+    // Splice half of the array to left, half to arr0. Middle not inclusive.
+    const left = arr0.splice(0, middle)
+    arr0 = merge(mergeSort(left), mergeSort(arr0))
+    return arr0
+}
+
+function merge(arr1, arr2) {
+    let arr3 = []
+    let minIdx = Number.MAX_SAFE_INTEGER
+
+    while (arr1.length && arr2.length){
+        if (arr1[0][1] < arr2[0][1]) {
+            let val = arr1.shift()
+            if (val[0] < minIdx){
+                minIdx = val[0]
+            }
+            arr3.push(val)
+        } else {
+            let val = arr2.shift()
+            if (val[0] < minIdx){
+                minIdx = val[0]
+            }
+            arr3.push(val)
+        }
+    }
+
+    // Use spread operator to spread/flatten out each array and concatenate them
+    arr1 = [...arr1, ...arr2]
+    for (i=0; i < arr1.length; i++) {
+        if (arr1[i][0] < minIdx) {
+            minIdx = arr1[i][0]
+        }
+    }
+
+    arr3 = [...arr3, ...arr1]
+    let color = '#'+ Math.floor(Math.random()*16777215).toString(16)
+    for (i=0; i < arr3.length; i++) {
+        nums[minIdx][1] = arr3[i][1]
+        nums[minIdx][2] = color    // random hex value
+        minIdx++
+    }
+
+    drawChart()
+
+    return arr3
+}
+
+async function shellSort() {
+    let increment = Math.floor(nums.length / 2)
+
+    while (increment > 0) {
+
+        for (i=increment; i<nums.length; i++){
+            let j = i
+            let value = nums[i][1]
+
+            nums[i][2] = 'red'
+            nums[j-increment][2] = 'yellow'
+            drawChart()
+            await sleep(SPEED)
+
+            while (j-increment >= 0 && nums[j-increment][1] > value) {
+                nums[j][1] = nums[j-increment][1]
+
+                nums[j][2] = 'purple'
+                nums[j-increment][2] = 'purple'
+                drawChart()
+                await sleep(SPEED)
+                nums[j][2] = '#069420'
+
+                j -= increment
+
+                if (j-increment >= 0){
+                    nums[j-increment][2] = 'yellow'
+                    drawChart()
+                    await sleep(SPEED)
+                }
+
+            }
+            nums[j][2] = '#069420'
+            if (j-increment >= 0){
+                nums[j-increment][2] = '#069420'
+            }
+
+            nums[j][1] = value
+        }
+
+        increment = Math.floor(increment/2)
+
+    }
+    drawChart()
+}
+
+function heapSort() {
+    return 0
+};
+
 function sleep(ms) {
+    // pulled from StackOverload. No built in sleep function in js
       return new Promise(resolve => setTimeout(resolve, ms))
 };
+
+function bad_sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+}

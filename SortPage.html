@@ -9,14 +9,25 @@
 </head>
 <body style="background: grey">
     <div id="chart_div"></div>
-    <button id="randomize">Randomize</button>
-    <button id="sort">Sort</button>
-    <button id="selection">Selection Sort</button>
-    <button id="bubble">Bubble Sort</button>
-    <button id="insertion">Insertion Sort</button>
-    <button id="random">Random Sort</button>
-    <button id="quick">Quick Sort</button>
-    <input id="speed" type="range" min="0">
-    <label for="speed">Speed</label>
+    <div style="display: flex; justify-content: center">
+        <button id="randomize">Randomize</button>
+        <button id="sort">Sort</button>
+        <button id="selection">Selection Sort</button>
+        <button id="bubble">Bubble Sort</button>
+        <button id="insertion">Insertion Sort</button>
+        <button id="random">Random Sort</button>
+        <button id="quick">Quick Sort</button>
+        <button id="shell">Shell Sort</button>
+        <button id="merge">Merge Sort</button>
+        <button id="heap">Heap Sort</button>
+    </div>
+    <div style="display: flex; justify-content: center">
+        <input id="number" type="range" min="2" max="200" step="1">
+        <label for="number"># Elements</label>
+        <input id="speed" type="range" min="0">
+        <label for="speed">Speed</label>
+
+    </div>
+
 </body>
 </html>
