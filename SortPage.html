@@ -5,12 +5,20 @@
     <title>Sort & Search</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="sort.js"></script>
-
+    <style>
+        div {margin:10px}
+    </style>
 </head>
 <body style="background: grey">
     <div id="chart_div"></div>
     <div style="display: flex; justify-content: center">
-        <button id="randomize">Randomize</button>
+        <button id="randomize" style="margin-right: 5%">Randomize</button><input id="number" type="range" min="2" max="200" step="1">
+        <label for="number" style="margin-right: 5%"># Elements</label>
+        <input id="speed" type="range" min="0">
+        <label for="speed" >Speed</label>
+    </div>
+    <div style="display: flex; justify-content: center">
+        <span>Sort Algorithms:</span>
         <button id="sort">Sort</button>
         <button id="selection">Selection Sort</button>
         <button id="bubble">Bubble Sort</button>
@@ -19,15 +27,15 @@
         <button id="quick">Quick Sort</button>
         <button id="shell">Shell Sort</button>
         <button id="merge">Merge Sort</button>
-        <button id="heap">Heap Sort</button>
+        <button id="heap" style="visibility:hidden">Heap Sort</button>
     </div>
     <div style="display: flex; justify-content: center">
-        <input id="number" type="range" min="2" max="200" step="1">
-        <label for="number"># Elements</label>
-        <input id="speed" type="range" min="0">
-        <label for="speed">Speed</label>
-
+        <span>Search Algorithms:</span>
+        <button id="linear">Linear</button>
+        <button id="binary">Binary</button>
+        <input type="number" step="1" id="searchnum" placeholder="Search Number">
     </div>
+
 
 </body>
 </html>
